@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Family Location Dashboard</title>
+
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    >
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background: #f7f7f7;
+        }
+
+        h1 {
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-top: 0;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logout-button {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .status-card,
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .status-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .status-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .member-card {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background: #f5f5f5;
+        }
+
+        .member-card h3 {
+            margin-top: 0;
+        }
+
+        .sharing-on {
+            color: green;
+            font-weight: bold;
+        }
+
+        .sharing-off {
+            color: red;
+            font-weight: bold;
+        }
+
+        #location,
+        #updated {
+            font-size: 16px;
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+
+        <div>
+            <h1>📍 Family Location Dashboard</h1>
+
+            <p class="subtitle">
+                Secure location-sharing dashboard
+            </p>
+        </div>
+
+        <a href="/logout">
+            <button class="logout-button">
+                Logout
+            </button>
+        </a>
+
+    </div>
+
+
+    <div class="status-card">
+
+        <div class="status-title">
+            Family Location System
+        </div>
+
+        <div id="sharingStatus" class="status-value">
+            Monitoring...
+        </div>
+
+    </div>
+
+
+    <div class="info-card">
+
+        <h2>👥 Family Members</h2>
+
+        <div id="members">
+
+            {% if members %}
+
+               {% for member in members %}
+
+    <div class="member-card">
+
+        <h3>👤 {{ member[1] }}</h3>
+
+        <p>
+            Username: {{ member[2] }}
+        </p>
+
+        {% if member[3] == 1 %}
+
+            <p class="sharing-on">
+                🟢 Sharing Location: ON
+            </p>
+
+        {% else %}
+
+            <p class="sharing-off">
+                🔴 Sharing Location: OFF
+            </p>
+
+        {% endif %}
+
+
+        {% if member[4] is not none %}
+
+            <p>
+                📍 Latitude:
+                {{ "%.6f"|format(member[4]) }}
+            </p>
+
+            <p>
+                📍 Longitude:
+                {{ "%.6f"|format(member[5]) }}
+            </p>
+
+            <p>
+                🕒 Last updated:
+                {{ member[6] }}
+            </p>
+
+        {% else %}
+
+            <p>
+                📍 No location available yet
+            </p>
+
+        {% endif %}
+
+    </div>
+
+{% endfor %}
+
+            {% else %}
+
+                <p>No family members added yet.</p>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <div class="info-card">
+
+        <p id="location">
+            Loading latest family locations...
+        </p>
+
+        <p id="updated">
+            Dashboard updates every 10 seconds.
+        </p>
+
+    </div>
+
+
+    <div id="map"></div>
+
+
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+
+
+    <script>
+
+        const map = L.map("map").setView([20, 78], 5);
+
+        L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                attribution: "&copy; OpenStreetMap contributors"
+            }
+        ).addTo(map);
+
+
+        // Store one marker for each family member
+        const markers = {};
+
+
+        function loadAllLocations() {
+
+            fetch("/all-locations")
+                .then(response => {
+
+                    if (!response.ok) {
+                        throw new Error("Unable to load locations.");
+                    }
+
+                    return response.json();
+
+                })
+                .then(data => {
+
+                    let locationCount = 0;
+
+                    data.forEach(member => {
+
+                        // No location for this member yet
+                        if (
+                            member.latitude === null ||
+                            member.longitude === null
+                        ) {
+                            return;
+                        }
+
+                        locationCount++;
+
+                        const latitude = member.latitude;
+                        const longitude = member.longitude;
+
+
+                        // Existing marker → move it
+                        if (markers[member.member_id]) {
+
+                            markers[member.member_id]
+                                .setLatLng([
+                                    latitude,
+                                    longitude
+                                ]);
+
+                            markers[member.member_id]
+                                .setPopupContent(
+                                    "<b>👤 " +
+                                    member.name +
+                                    "</b><br>" +
+                                    "📍 Latitude: " +
+                                    latitude.toFixed(6) +
+                                    "<br>" +
+                                    "📍 Longitude: " +
+                                    longitude.toFixed(6) +
+                                    "<br>" +
+                                    "🕒 Updated: " +
+                                    member.timestamp
+                                );
+
+                        }
+
+                        // New member → create marker
+                        else {
+
+                            markers[member.member_id] =
+                                L.marker([
+                                    latitude,
+                                    longitude
+                                ])
+                                .addTo(map)
+                                .bindPopup(
+                                    "<b>👤 " +
+                                    member.name +
+                                    "</b><br>" +
+                                    "📍 Latitude: " +
+                                    latitude.toFixed(6) +
+                                    "<br>" +
+                                    "📍 Longitude: " +
+                                    longitude.toFixed(6) +
+                                    "<br>" +
+                                    "🕒 Updated: " +
+                                    member.timestamp
+                                );
+                        }
+
+                    });
+
+
+                    document.getElementById("location").textContent =
+                        "📍 Family members currently sharing locations: " +
+                        locationCount;
+
+                    document.getElementById("updated").textContent =
+                        "Last dashboard update: " +
+                        new Date().toLocaleTimeString();
+
+                })
+                .catch(error => {
+
+                    console.error(
+                        "Error loading member locations:",
+                        error
+                    );
+
+                    document.getElementById("location").textContent =
+                        "Unable to load family locations.";
+
+                });
+        }
+
+
+        // Load immediately
+        loadAllLocations();
+
+
+        // Refresh every 10 seconds
+        setInterval(loadAllLocations, 10000);
+
+    </script>
+
+</body>
+</html>

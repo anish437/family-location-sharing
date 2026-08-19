@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>My Families</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            border-bottom: 1px solid #ddd;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .logout {
+            background: #dc3545;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+        .welcome {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+        }
+
+        .welcome h2 {
+            margin-top: 0;
+        }
+
+        .family-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(260px, 1fr));
+
+            gap: 20px;
+        }
+
+        .family-card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+
+            box-shadow:
+                0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .family-card h3 {
+            margin-top: 0;
+        }
+
+        .family-info {
+            color: #666;
+            margin: 8px 0;
+        }
+
+        .open-button {
+            display: block;
+            text-align: center;
+
+            background: #198754;
+            color: white;
+
+            text-decoration: none;
+
+            padding: 12px;
+
+            border-radius: 7px;
+
+            margin-top: 18px;
+        }
+
+        .open-button:hover {
+            background: #157347;
+        }
+
+        .empty {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            color: #666;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+<div class="header">
+
+    <div>
+
+        <h1>
+            👨‍👩‍👧 My Families
+        </h1>
+
+    </div>
+
+    <a
+        href="/member-logout"
+        class="logout"
+    >
+        Logout
+    </a>
+
+</div>
+
+
+<div class="container">
+
+
+    <div class="welcome">
+
+        <h2>
+            👋 Welcome, {{ session["user_name"] }}
+        </h2>
+
+        <p>
+            Select a family to continue.
+        </p>
+
+    </div>
+
+
+    {% if families %}
+
+        <div class="family-grid">
+
+
+            {% for family in families %}
+
+                <div class="family-card">
+
+                    <h3>
+                        👨‍👩‍👧 {{ family[1] }}
+                    </h3>
+
+                    <p class="family-info">
+
+                        Family Username:
+
+                        <strong>
+                            {{ family[2] }}
+                        </strong>
+
+                    </p>
+
+                    <p class="family-info">
+
+                        Role:
+
+                        {% if family[3] == "admin" %}
+
+                            👑 Administrator
+
+                        {% else %}
+
+                            👤 Member
+
+                        {% endif %}
+
+                    </p>
+
+                    <p class="family-info">
+
+                        Status:
+
+                        <strong>
+                            ✅ Approved
+                        </strong>
+
+                    </p>
+
+
+                    <a
+                        href="/select-family/{{ family[0] }}"
+                        class="open-button"
+                    >
+                        Open Family →
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+
+        </div>
+
+    {% else %}
+
+        <div class="empty">
+
+            <h3>
+                You haven't joined any families yet.
+            </h3>
+
+            <p>
+                Ask your family administrator for the
+                family username and password.
+            </p>
+
+            <a href="/join-family">
+                Join a Family
+            </a>
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+</body>
+
+</html>

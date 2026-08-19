@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Family Admin Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            color: #222;
+        }
+
+        /* ==============================
+           HEADER
+        ============================== */
+
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #ddd;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            color: #666;
+        }
+
+        .logout {
+            background: #dc3545;
+            color: white;
+            text-decoration: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+        }
+
+        /* ==============================
+           MAIN
+        ============================== */
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 25px;
+        }
+
+        /* ==============================
+           FAMILY INFORMATION
+        ============================== */
+
+        .family-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .family-card h2 {
+            margin-top: 0;
+        }
+
+        .family-info {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .info-box {
+            background: #f4f6f9;
+            padding: 15px 20px;
+            border-radius: 8px;
+        }
+
+        .info-title {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .info-value {
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        /* ==============================
+           SECTION
+        ============================== */
+
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .section h2 {
+            margin-top: 0;
+        }
+
+        /* ==============================
+           PENDING REQUEST
+        ============================== */
+
+        .request {
+            background: #fff8e6;
+            border: 1px solid #f0d58a;
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 12px;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .request-info h3 {
+            margin: 0 0 6px;
+        }
+
+        .request-info p {
+            margin: 4px 0;
+            color: #666;
+        }
+
+        .request-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .approve {
+            background: #198754;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .reject {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .approve:hover {
+            background: #157347;
+        }
+
+        .reject:hover {
+            background: #bb2d3b;
+        }
+
+        /* ==============================
+           MEMBERS
+        ============================== */
+
+        .members-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(260px, 1fr));
+
+            gap: 15px;
+        }
+
+        .member-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 18px;
+            background: #fafafa;
+        }
+
+        .member-card h3 {
+            margin-top: 0;
+        }
+
+        .member-info {
+            margin: 8px 0;
+            color: #555;
+        }
+
+        /* ==============================
+           STATUS
+        ============================== */
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .approved {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .sharing {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .not-sharing {
+            background: #e9ecef;
+            color: #555;
+        }
+
+        .pending {
+            background: #fff3cd;
+            color: #664d03;
+        }
+
+        /* ==============================
+           EMPTY
+        ============================== */
+
+        .empty {
+            color: #777;
+            padding: 10px 0;
+        }
+
+        /* ==============================
+           RESPONSIVE
+        ============================== */
+
+        @media (max-width: 600px) {
+
+            .header {
+                padding: 15px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .request {
+                align-items: flex-start;
+            }
+
+        }
+        .remove-member-button {
+
+    background: #dc3545;
+
+    color: white;
+
+    border: none;
+
+    padding: 8px 12px;
+
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    margin-top: 12px;
+}
+
+
+.remove-member-button:hover {
+
+    background: #bb2d3b;
+}
+
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================
+     HEADER
+===================================== -->
+
+<div class="header">
+
+    <div>
+
+        <h1>
+            👨‍👩‍👧 {{ family[0] }}
+        </h1>
+
+        <p>
+            👑 Family Administrator Dashboard
+        </p>
+
+    </div>
+
+
+    <a href="/logout"
+       class="logout">
+
+        Logout
+
+    </a>
+
+</div>
+
+
+
+<div class="container">
+
+
+    <!-- =====================================
+         FAMILY INFORMATION
+    ====================================== -->
+
+    <div class="family-card">
+
+        <h2>
+            🏠 Family Information
+        </h2>
+
+
+        <div class="family-info">
+
+
+            <div class="info-box">
+
+                <div class="info-title">
+                    Family Name
+                </div>
+
+                <div class="info-value">
+                    {{ family[0] }}
+                </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <div class="info-title">
+                    Family Username
+                </div>
+
+                <div class="info-value">
+                    {{ family[1] }}
+                </div>
+
+            </div>
+
+
+            <div class="info-box">
+
+                <div class="info-title">
+                    Your Role
+                </div>
+
+                <div class="info-value">
+                    👑 Administrator
+                </div>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================
+         PENDING REQUESTS
+    ====================================== -->
+
+    <div class="section">
+
+        <h2>
+            📩 Pending Join Requests
+        </h2>
+
+
+        {% if pending_requests %}
+
+
+            {% for request in pending_requests %}
+
+
+                <div class="request">
+
+
+                    <div class="request-info">
+
+                        <h3>
+                            👤 {{ request[1] }}
+                        </h3>
+
+                        <p>
+                            Username:
+                            <strong>{{ request[2] }}</strong>
+                        </p>
+
+                        <p>
+                            Requested:
+                            {{ request[3] }}
+                        </p>
+
+                    </div>
+
+
+                    <div class="request-buttons">
+
+
+                        <!-- APPROVE -->
+
+                        <form
+                            method="POST"
+                            action="/approve-request/{{ request[0] }}"
+                        >
+
+                            <button
+                                type="submit"
+                                class="approve"
+                            >
+                                ✅ Approve
+                            </button>
+
+                        </form>
+
+
+                        <!-- REJECT -->
+
+                        <form
+                            method="POST"
+                            action="/reject-request/{{ request[0] }}"
+                        >
+
+                            <button
+                                type="submit"
+                                class="reject"
+                            >
+                                ❌ Reject
+                            </button>
+
+                        </form>
+
+
+                    </div>
+
+
+                </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <p class="empty">
+                🎉 No pending join requests.
+            </p>
+
+
+        {% endif %}
+
+    </div>
+
+
+
+    <!-- =====================================
+         APPROVED FAMILY MEMBERS
+    ====================================== -->
+
+    <div class="section">
+
+        <h2>
+            👥 Family Members
+        </h2>
+
+
+        {% if members %}
+
+
+            <div class="members-grid">
+
+                {% for member in members %}
+
+                    <div class="member-card">
+
+                        <h3>
+                            👤 {{ member[2] }}
+                        </h3>
+
+
+                        <div class="member-info">
+
+                            Username:
+
+                            <strong>
+                                {{ member[3] }}
+                            </strong>
+
+                        </div>
+
+
+                        <div class="member-info">
+
+                            Role:
+
+                            {% if member[4] == "admin" %}
+
+                                👑 Administrator
+
+                            {% else %}
+
+                                👤 Member
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="member-info">
+
+                            Status:
+
+                            <span class="status approved">
+                                ✅ Approved
+                            </span>
+
+                        </div>
+
+
+                        <div class="member-info">
+
+                            Location:
+
+                            {% if member[6] %}
+
+                                <span class="status sharing">
+                                    🟢 Sharing
+                                </span>
+
+                            {% else %}
+
+                                <span class="status not-sharing">
+                                    ⚪ Not Sharing
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <!-- =========================================
+                            REMOVE MEMBER
+                        ========================================== -->
+
+                        {% if member[4] != "admin" %}
+
+                            <form
+                                method="POST"
+                                action="/remove-member/{{ member[0] }}"
+                                onsubmit="return confirm(
+                                    'Are you sure you want to remove this member from the family?'
+                                );"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="remove-member-button"
+                                >
+                                    🗑️ Remove Member
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+        {% else %}
+
+
+            <p class="empty">
+                No approved family members yet.
+            </p>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
